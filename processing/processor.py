@@ -3,10 +3,11 @@ import re
 import unicodedata
 from datetime import datetime
 from kafka import KafkaConsumer, KafkaProducer
+import os
 
 RAW_TOPIC = "raw-news"
 PROCESSED_TOPIC = "processed-news"
-BOOTSTRAP_SERVERS = "localhost:9092"
+BOOTSTRAP_SERVERS = os.getenv("KAFKA_BROKERS", "localhost:9092")
 
 
 def clean_text(text: str) -> str:

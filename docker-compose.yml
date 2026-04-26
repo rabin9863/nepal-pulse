@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.1
@@ -7,6 +9,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - nepal-pulse-network
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
@@ -19,11 +23,63 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
-
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - nepal-pulse-network
+    healthcheck:
+      test: kafka-broker-api-versions --bootstrap-server localhost:9092
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  ingestion:
+    build:
+      context: ./ingestion
+      dockerfile: dockerfile
+    container_name: nepal-pulse-ingestion
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKERS: kafka:29092
+    networks:
+      - nepal-pulse-network
+    restart: on-failure
+
+  processing:
+    build:
+      context: ./processing
+      dockerfile: dockerfile
+    container_name: nepal-pulse-processing
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKERS: kafka:29092
+    networks:
+      - nepal-pulse-network
+    restart: on-failure
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: dockerfile
+    container_name: nepal-pulse-dashboard
+    depends_on:
+      - kafka
+    ports:
+      - "8501:8501"
+    environment:
+      KAFKA_BROKERS: kafka:29092
+    networks:
+      - nepal-pulse-network
+    restart: on-failure
+
+networks:
+  nepal-pulse-network:
+    driver: bridge
