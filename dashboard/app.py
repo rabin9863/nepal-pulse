@@ -782,7 +782,7 @@ st.markdown("""
         A real-time news intelligence dashboard for monitoring what is happening in Nepal,
         discovering trending topics, and comparing news activity across multiple sources.
     </div>
-    <div class="header-authors">Developed by Rabin Dhakal and Asis Shrestha</div>
+    
 </div>
 """, unsafe_allow_html=True)
 
