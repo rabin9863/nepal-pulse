@@ -69,76 +69,37 @@ Install the following before running:
 
 ---
 
-## 1. Clone the Repository
+## STEP-BY-STEP TUTORIAL ON STARTING THE PROJECT
+STEP 1
+Clone the Repository
 ---
 ```bash
 git clone https://github.com/rabin9863/nepal-pulse.git
 cd nepal-pulse
 ---
 
-## 2. Start Kafka
+STEP 2 
+OPEN DOCKER DESKTOP IN BACKGROUND
 
-docker compose up -d
+STEP 3 
+IN VSCODE 
 
-Verify:
-docker ps
+run the command --- 
 
-You should see:
-nepal-pulse-kafka
-nepal-pulse-zookeeper
+docker compose up -- build 
 
-## 3. Setup Ingestion Service (Node.js)
-cd ingestion
-npm install
+--------------------------
 
-## 4. Setup Processing Service (Python)
-cd ../processing
-python3 -m venv venv
-source venv/bin/activate
-pip install kafka-python scikit-learn nltk
+STEP 4
+IN DOCKER DESKTOP 
 
-## 5. Setup Dashboard
-cd ../dashboard
-python3 -m venv venv
-source venv/bin/activate
-pip install streamlit kafka-python pandas scikit-learn
+Wait until you see the container named "nepal-pulse"
 
-
-
-# RUNNING THE PROJECT
-
- Open 4 separate terminals
-
- Terminal 1 — Processor
-cd nepal-pulse/processing
-source venv/bin/activate
-python processor.py
-
- Terminal 2 — Topic Modeling
-cd nepal-pulse/processing
-source venv/bin/activate
-python topic_model.py
-
- Terminal 3 — Dashboard
-cd nepal-pulse/dashboard
-source venv/bin/activate
-python -m streamlit run app.py
-
+STEP 5
 Open in browser:
 http://localhost:8501
 
- Terminal 4 — Scraper
-cd nepal-pulse/ingestion
-npx tsx src/scraper.ts
 
-## Normal Startup Order (IMPORTANT)
-Every time you run the project:
-
-1. docker compose up -d
-2. run processor.py
-3. run topic_model.py
-4. run dashboard
-5. run scraper
 
 ## How It Works
 
@@ -158,27 +119,11 @@ Latest news table
 Frequent words chart
 
 ## Stop the Project
-Stop Kafka:
-docker compose down
-Stop scripts:
 CTRL + C
 
-## Troubleshooting
 
-Kafka not connecting
-docker compose up -d
-docker ps
 
-ModuleNotFoundError: kafka
-source venv/bin/activate
 
-pip install kafka-python
-ModuleNotFoundError: sklearn
-pip install scikit-learn
-Scraper not found
-Make sure you're in ingestion folder:
-cd ingestion
-npx tsx src/scraper.ts
 
 ## Project Structure
 nepal-pulse/
